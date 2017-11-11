@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Pokereum</title>
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-104237560-4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments)};
+      gtag('js', new Date());
+      gtag('config', 'UA-104237560-4');
+    </script>
+    
+    <!-- Register Jquer Module in Electron -->
+    <!-- http://ourcodeworld.com/articles/read/202how-to-include-and-use-jquery-in-electron-framework  -->
+
+    <script type="text/javascript">
+    //delay to allow web3 load on browser
+    console.log(typeof global)
+        global = typeof global == 'undefined'?{}:global;
+        global.proto = {
+            crypto: window.crypto || window.msCrypto,
+            Uint8Array: Uint8Array
+        };
+    </script>
+  <!--  <script type="text/javascript" src="dist/web3.js"></script>-->
+    <script>
+
+    //Defaults to Browser
+    var ELECTRON_ON = false;
+    window.requireNode = false;
+
+    //Check if in electron or browser
+    if(typeof(window.require) != 'undefined'){
+      //electron
+      console.log("In Electron");
+      // window.$ = window.jQuery = require('./js/lib/jquery');
+      window.requireNode = window.require;
+      // window.require = undefined;
+      ELECTRON_ON = true;
+    }
+
+    </script>
+    <!--
+            <link rel="stylesheet" type="text/css" href="js/lib/semantic-ui/semantic.css">
+        -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css">
+    <script type="text/javascript" src="js/lib/intercom.js"></script>
+    <!--<script src="main-web.js"></script>-->
+    <!-- <script src="js/lib/semantic-ui/semantic.js"></script> -->
+    <script src="js/bundlelobby.js"></script>
+    <style type="text/css">
+        body{
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+          background-color: #000;
+        }
+
+        body>div:first-of-type {
+            margin:auto auto;
+            width: 1200px;
+            height: 690px;
+            background: url("assets/images/lobbysprite.png") 0 0;
+            background-origin: content-box;
+            background-repeat: no-repeat;
+            background-color: #000;
+        }
+
+        .ui.menu .item img.logo {
+            margin-right: 1.5em;
+        }
+
+        .maincontainer {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+  <div>
+
+    <div id="maincontainer" class="ui fluid container maincontainer">
+
+         <div class="ui dimmer common">
+            <div class="ui indeterminate text loader dimmertext" ></div>
+        </div>
+
+        <div class="ui grid">
+            <div class="column">
+                <h3 class="ui horizontal divider header" style="color:#fff">
+                    Pokereum
+                </h3>
+                <div class="ui segment">
+                    <button class="ui blue button createnewgame">Create New Game </button>
+                    <button class="ui blue button right floated createdemogame">Play Demo Game </button>
+                </div>
+                <div class="dimmable">
+                    <!--
+                        <div class="ui active inverted dimmer">
+                            <div class="ui loader"></div>
+                        </div>
+                        -->
+                    <table class="ui unstackable striped table segment" id="games">
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Eof  container -->
+    <!-- Create Game Modal -->
+    <div id="createGameModal" class="ui small modal">
+        <i class="close icon"></i>
+
+        <div class="header">
+            Create New Game
+        </div>
+        <div class="image content">
+            <!--
+                    <div class="description">
+                    </div>
+                    -->
+            <div class="ui form">
+                <form id="createnewgameForm">
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Minimum Bid</label>
+                            <input name="minbid" value="5" type="number" step="5" placeholder="Minimum Bid">
+                        </div>
+                        <div class="field">
+                            <label>Maximum Bid</label>
+                            <input name="maxbid" value="200" type="number" step="5" placeholder="Maximum Bid">
+                        </div>
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Minimum Players</label>
+                            <input name="minply" value="2" type="number" min="2" max="9" step="1" placeholder="Minimum Players">
+                        </div>
+                        <div class="field">
+                            <label>Maximum Players</label>
+                            <input name="maxply" value="3" type="number" min="2" max="9" step="1" placeholder="Maximum Players">
+                        </div>
+                    </div>
+                    <div class="one fields">
+                        <div class="field">
+                            <label>Stake</label>
+                            <input name="stake" value="30" type="number" min="5" placeholder="Total playing stake">
+                        </div>
+                    </div>
+                    <!--  <div class="two fields">
+                                <div class="field">
+                                    <label>Hand 1</label>
+                                    <input name="hand1" type="text" placeholder="Hand 1">
+                                </div>
+                                <div class="field">
+                                    <label>Hand 2</label>
+                                    <input name="hand2" type="text" placeholder="Hand 2">
+                                </div>
+                            </div>
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>gameChatTopic1</label>
+                                    <input name="gameChatTopic1" type="text" placeholder="gameChatTopic1">
+                                </div>
+                                <div class="field">
+                                    <label>gameChatTopic1</label>
+                                    <input name="gameChatTopic2" type="text" placeholder="gameChatTopic2">
+                                </div>
+                            </div>
+                            <div class="one fields">
+                                <div class="field">
+                                    <label>whisperID</label>
+                                    <input name="whisperID"  type="text" placeholder="whisperID">
+                                </div>
+                            </div>
+                            -->
+                </form>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui black deny button">
+                Close
+            </div>
+            <div class="ui positive right labeled icon button">
+                Save
+                <i class="checkmark icon"></i>
+            </div>
+        </div>
+    </div>
+    <!-- -->
+
+
+
+      <div  id="warningModal" class="ui small modal" style="margin-top: -109.5px;">
+          <i class="close icon"></i>
+          <div class="header">
+              Warning
+          </div>
+          <div class="content">
+              <p id="erorrText"></p>
+              <p>Probably you need to unlock account. Kindly ensure your wallet is unlocked for this step</p>
+          </div>
+          <div class="actions">
+          <div class="ui positive right labeled icon button">
+                  OK
+                  <i class="checkmark icon"></i>
+              </div>
+          </div>
+      </div>
+
+
+    <!-- <div class="ui basic modal">
+                <div class="ui icon header">
+                    <i class="archive icon"></i>
+                    Archive Old Messages
+                </div>
+                <div class="content">
+                    <p>Your inbox is getting full, would you like us to enable automatic archiving of old messages?</p>
+                </div>
+                <div class="actions">
+                    <div class="ui red basic cancel inverted button">
+                        <i class="remove icon"></i>
+                        No
+                    </div>
+                    <div class="ui green ok inverted button">
+                        <i class="checkmark icon"></i>
+                        Yes
+                    </div>
+                </div>
+            </div>
+            -->
+    </div>
+</body>
+
+</html>
