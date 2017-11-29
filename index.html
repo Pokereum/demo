@@ -1,51 +1,142 @@
-﻿<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
+
 <head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-<title>Pokereum  / Demo Client</title>
+    <meta charset="UTF-8" />
+    <title>Pokereum</title>
 
-<!--CSS-->
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/bootstrap-light.css">
-<link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
-<!--/CSS-->
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-104237560-4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments)};
+      gtag('js', new Date());
+      gtag('config', 'UA-104237560-4');
+    </script>
 
-<!--JS-->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="js/jquery.plugin.js"></script>
-<script src="js/jquery.countdown.js"></script>
-<script>
-$(function () {
-	$('#defaultCountdown').countdown({until: new Date(2017, 9-1, 14)}); 
-	//Replace above date with your own, to find out more visit http://keith-wood.name/countdown.html
-});
-</script>
-<!--/JS-->
+    <script>
+    //Redirect to browser if not in Electron
+        if(typeof require !== 'function')
+        window.location.href = './index-web.html#demo';
+
+        console.log(window.location.hash)
+
+        if(window.location.hash != "#demo")
+        window.location = "#demo"
+
+        window.requireNode = window.require;
+        // window.require = undefined;
+        const ELECTRON_ON = true;
+        const IS_DEMO = (window.location && window.location.hash == "#demo");
+    </script>
+
+    <!--give in script css precedence-->
+    <link type="text/css" href="js/lib/semantic-ui/semantic.min.css" rel="stylesheet" />
+    <link type="text/css" href="js/lib/chatbox/chatbox.css" rel="stylesheet" />
+    <link type="text/css" href="js/lib/malihu-custom-scrollbar-plugin-master/jquery.mCustomScrollbar.css" rel="stylesheet" />
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            background-color: #000;
+        }
+
+        #game-area {
+            margin:auto auto;
+            width: 1200px;
+            height: 690px;
+            background-origin: content-box;
+            background-repeat: no-repeat;
+            background-color: #000;
+          }
+
+          #countdown{
+                margin-top: 30px;
+                color:#ccc;
+                font-size:20px;
+                text-align:center
+          }
+          #countdown a{
+            color:#ccc;
+            text-decoration: underline;
+          }
+          #countdown-box{}
+          #countdown-box .timer-box{}
+
+          .message-box{padding:0px 10px !important;bottom:-15px !important;}
+          .chat.playerchat,.chat.dealerchat{box-sizing: content-box;}
+          .message-box .message-submit{top:0.1em !important;padding: 0;}
+          .message-box .message-input{width:inherit !important;}
+          .message-box textarea{overflow: hidden;}
+          .side-game{float:left;margin:0;width:80%;height:100vh;}
+          .chat{position:absolute !important;}
+    </style>
+    <script type="text/javascript" src="js/lib/phaser.min.js"></script>
+    <script src="js/bundle.js"></script>
+
+    <script type="text/javascript" src="js/lib/jquery.countdown.package-2.1.0/js/jquery.plugin.min.js"></script>
+    <script type="text/javascript" src="js/lib/jquery.countdown.package-2.1.0/js/jquery.countdown.min.js"></script>
+    <!--<script src="main.js"></script>-->
 
 </head>
 
 <body>
 
-<!--DARK OVERLAY-->
-<div class="overlay"></div>
-<!--/DARK OVERLAY-->
+    <!--<div style="position:absolute">
+    <a href="javascript:window.open('popup.html');"> Simulate Game  </a>
+</div>-->
 
-<!--WRAP-->
-<div id="wrap">
-	<!--CONTAINER-->
-	<div class="container">
-		<img src="images/pokereum.png" alt="Paper Plane" class="image-align" />
-		<h1>
-			<span>Poker Disrupted By</span><br/>
-			 The First Provably fair decentralized poker : <span class="yellow">Pokereum.</span>
-		</h1>
-		<p>Our playable client  <strong>will be deployed to the Ethereum & Rootstock testnets.</strong><br/> Get ready for a taste in :</p>
-		<div id="defaultCountdown"></div>
-		
-	</div>
-	<!--/CONTAINER-->
+    <div style="position:absolute;">
+        <div class="chat playerchat" style="visibility:hidden;">
+            <div class="messages">
+                <div class="messages-content"></div>
+            </div>
+            <div class="message-box">
+                <textarea type="text" class="message-input" placeholder="Type message..."></textarea>
+                <button type="submit" class="message-submit"></button>
+            </div>
+        </div>
+
+
+        <div class="chat dealerchat" style="visibility:hidden;">
+            <div class="messages">
+                <div class="messages-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin:0;padding:0px;">
+        <div id="game-area" style="padding: 0px;"></div>
+        <!--<webview id="wv" src="popup.html" nodeintegration style="display:none;padding: 0px;float:right;margin:0;height:100vh;width:20%;overflow:scroll">
+        </webview>-->
+    </div>
+
+    <div id="countdown">
+        <a href="https://github.com/Pokereum/pokereum/wiki/Whitepaper" target="_blank">Shadow Poker</a> demo version
+        ( <a href="https://en.wikipedia.org/wiki/Mental_poker" target="_blank">Mental Poker</a> ) to ETH Testnet in: <time datetime="" >
+          <span id="countdown-box"></span>
+        </time>
+    </div>
+
+    <!--
+<div id="chat_div">
+    <script>document.write(process.versions.node)</script>
 </div>
-<!--/WRAP-->
+-->
+
+    <script>
+        // requireNode('electron').ipcRenderer.on('ping', (event, message) => {
+        //   console.log('message from main channel : ', message);
+        // });
+    </script>
+
+    <!--
+  <div class="message-box">
+    <textarea type="text" class="message-input" placeholder="Type message..."></textarea>
+   <button type="submit" class="message-submit">Send</button>
+  </div>
+ -->
 
 </body>
+
 </html>
